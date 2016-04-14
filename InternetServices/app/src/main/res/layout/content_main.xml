@@ -12,7 +12,7 @@
     tools:context="com.example.yalingwu.internetservices.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <AutoCompleteTextView
+    <com.example.yalingwu.internetservices.CustomAutoCompleteTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/startLocTxt"
@@ -23,7 +23,7 @@
         android:layout_marginTop="50dp"
         android:textAlignment="center" />
 
-    <AutoCompleteTextView
+    <com.example.yalingwu.internetservices.CustomAutoCompleteTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/endLocTxt"

@@ -2,10 +2,6 @@ package com.example.yalingwu.internetservices;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -15,12 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -39,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     AutoCompleteTextView startLocTxt;
     AutoCompleteTextView endLocTxt;
+    AutoCompleteTextView curTxt;
     EditText mileRangeTxt;
 
     PlacesTask placesTask_start;
@@ -53,15 +48,29 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         startLocTxt = (AutoCompleteTextView) findViewById(R.id.startLocTxt);
-        endLocTxt = (AutoCompleteTextView) findViewById(R.id.startLocTxt);
+        endLocTxt = (AutoCompleteTextView) findViewById(R.id.endLocTxt);
         startLocTxt.setThreshold(1);
         endLocTxt.setThreshold(1);
-
+        startLocTxt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                startLocTxt.showDropDown();
+                return false;
+            }
+        });
+        endLocTxt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                endLocTxt.showDropDown();
+                return false;
+            }
+        });
 
         startLocTxt.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                curTxt = startLocTxt;
                 placesTask_start = new PlacesTask();
                 placesTask_start.execute(s.toString());
             }
@@ -69,18 +78,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
-                // TODO Auto-generated method stub
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
             }
         });
         endLocTxt.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                curTxt = endLocTxt;
                 placesTask_end = new PlacesTask();
                 placesTask_end.execute(s.toString());
             }
@@ -88,17 +96,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
-                // TODO Auto-generated method stub
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
             }
         });
 
         mileRangeTxt = (EditText) findViewById(R.id.mileRangeTxt);
-
         Button submitBtn = (Button) findViewById(R.id.submitBtn);
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -126,29 +131,20 @@ public class MainActivity extends AppCompatActivity {
         HttpURLConnection urlConnection = null;
         try{
             URL url = new URL(strUrl);
-
             // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
+            urlConnection = (HttpURLConnection)url.openConnection();
             // Connecting to url
             urlConnection.connect();
-
             // Reading data from url
             iStream = urlConnection.getInputStream();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
             StringBuffer sb  = new StringBuffer();
-
             String line = "";
-            while( ( line = br.readLine())  != null){
+            while((line = br.readLine())!= null){
                 sb.append(line);
             }
-
             data = sb.toString();
-
             br.close();
-
         }catch(Exception e){
             Log.d("Exception while downloading url", e.toString());
         }finally{
@@ -163,37 +159,20 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... place) {
-            // For storing data from web service
             String data = "";
-
             // Obtain browser key from https://code.google.com/apis/console
             String key = "key=AIzaSyBbU5w64F7Rl2Dr_JPAWcw1tTr0WkROPHY";
-
             String input="";
-
             try {
                 input = "input=" + URLEncoder.encode(place[0], "utf-8");
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
             }
-
-            // place type to be searched
             String types = "types=geocode";
-
-            // Sensor enabled
-//            String sensor = "sensor=false";
-
-            // Building the parameters to the web service
             String parameters = input+"&"+types+"&"+key;
-
-            // Output format
             String output = "json";
-
-            // Building the url to the web service
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
-
             try{
-                // Fetching the data from web service in background
                 data = downloadUrl(url);
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
@@ -204,11 +183,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Creating ParserTask
             parserTask = new ParserTask();
-
-            // Starting Parsing the JSON string returned by Web Service
             parserTask.execute(result);
         }
     }
@@ -220,17 +195,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected List<HashMap<String, String>> doInBackground(String... jsonData) {
-
             List<HashMap<String, String>> places = null;
-
             PlaceJSONParser placeJsonParser = new PlaceJSONParser();
-
             try{
                 jObject = new JSONObject(jsonData[0]);
-
-                // Getting the parsed data as a List construct
                 places = placeJsonParser.parse(jObject);
-
             }catch(Exception e){
                 Log.d("Exception",e.toString());
             }
@@ -239,16 +208,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<HashMap<String, String>> result) {
-
-            String[] from = new String[] { "description"};
-            int[] to = new int[] { android.R.id.text1 };
-
-            // Creating a SimpleAdapter for the AutoCompleteTextView
+            String[] from = new String[] {"description"};
+            int[] to = new int[] {android.R.id.text1};
             SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, android.R.layout.simple_list_item_1, from, to);
-
             // Setting the adapter
-            startLocTxt.setAdapter(adapter);
-            endLocTxt.setAdapter(adapter);
+//            startLocTxt.setAdapter(adapter);
+//            endLocTxt.setAdapter(adapter);
+            curTxt.setAdapter(adapter);
         }
     }
 
