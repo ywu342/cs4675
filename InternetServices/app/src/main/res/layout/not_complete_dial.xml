@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clickable="true"
+    android:visibility="visible">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please complete all the fields!"
+        android:id="@+id/dialbody"
+        android:textAlignment="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="20dp"
+        android:textColor="#d19494"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:id="@+id/dialogButtonOK"
+        android:textColor="#2fb326"
+        android:background="#fdfcf7"
+        android:layout_marginTop="49dp"
+        android:layout_below="@+id/dialbody"
+        android:layout_alignRight="@+id/dialbody"
+        android:layout_alignEnd="@+id/dialbody"
+        android:textSize="15dp" />
+</RelativeLayout>

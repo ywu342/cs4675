@@ -1,5 +1,7 @@
 package com.example.yalingwu.internetservices;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -31,6 +34,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    final Context context = this;
     AutoCompleteTextView startLocTxt;
     AutoCompleteTextView endLocTxt;
     AutoCompleteTextView curTxt;
@@ -114,7 +118,27 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("start: "+slt+",end: "+elt+",milerange: "+mrt);
                 if(slt.equals("")||elt.equals("")||mrt.equals("")){
                     //TODO: give a popup warning to complete all the fields
-                    System.out.println("Please complete all fields");
+                    // custom dialog
+                    final Dialog dialog = new Dialog(context);
+                    dialog.setContentView(R.layout.not_complete_dial);
+                    dialog.setTitle("Forgot something...");
+
+                    // set the custom dialog components - text and button
+//                    TextView text = (TextView) dialog.findViewById(R.id.dialbody);
+//                    text.setText("Please complete all the fields!");
+//                    ImageView image = (ImageView) dialog.findViewById(R.id.image);
+//                    image.setImageResource(R.drawable.ic_launcher);
+
+                    Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                    // if button is clicked, close the custom dialog
+                    dialogButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                    System.out.println("Please complete all the fields");
                 }
                 else {
                     float mileRange = Float.parseFloat(mrt);
