@@ -7,6 +7,10 @@
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission  android:name="com.example.yalingwu.internetservices.permission.MAPS_RECEIVE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -25,6 +29,10 @@
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -36,6 +44,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".RoutesDisplay"></activity>
+
+        <permission
+            android:name="com.example.yalingwu.internetservices.permission.MAPS_RECEIVE"
+            android:protectionLevel="signature"/>
+        <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.example.yalingwu.internetservices;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -142,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     float mileRange = Float.parseFloat(mrt);
+                    //go to next screen on submit
+                    Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+                    startActivity(goToResults);
                 }
                 //TODO: process start and end locations
             }
