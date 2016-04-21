@@ -244,9 +244,9 @@ public class MainActivity extends AppCompatActivity {
 //                    queue.add(request);
 
                     // Using Async Task to query the server
-                    gasStationTask = new GasStationTask();
+//                    gasStationTask = new GasStationTask();
 //                    gasStationTask.execute(slt,elt);
-                    gasStationTask.execute("atlanta","Marietta");
+//                    gasStationTask.execute("atlanta","Marietta");
 
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);

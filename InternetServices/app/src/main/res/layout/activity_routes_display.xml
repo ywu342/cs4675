@@ -19,7 +19,7 @@
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
         class="com.google.android.gms.maps.SupportMapFragment"
-        android:id="@+id/map"
+        android:id="@+id/map_frag"
         android:layout_width="350dp"
         android:layout_height="350dp"
         android:layout_alignParentBottom="true"

@@ -1,5 +1,6 @@
 package com.example.yalingwu.internetservices;
 
+import android.bluetooth.le.AdvertiseData;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,9 +20,14 @@ import android.widget.ListView;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -46,6 +52,8 @@ public class RoutesDisplay extends FragmentActivity {
     String dest_addr;
     GoogleMap map;
     ArrayList<LatLng> markerPoints;
+    LatLng src;
+    LatLng dst;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -58,18 +66,32 @@ public class RoutesDisplay extends FragmentActivity {
         setContentView(R.layout.activity_routes_display);
 
         markerPoints = new ArrayList<LatLng>();
-        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_frag);
         map = fm.getMap();
         if (map != null) {
+
             map.setMyLocationEnabled(true);
-            // Getting URL to the Google Directions API
-            String url = getDirectionsUrl(source_addr, dest_addr);
+            src = new LatLng(40.714224,-73.961452);
+            dst = new LatLng(37.42245,-122.084033);
 
+            markerPoints.add(src);
+            markerPoints.add(dst);
+            MarkerOptions options_src = new MarkerOptions();
+            MarkerOptions options_dst = new MarkerOptions();
+            options_src.position(src);
+            options_src.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            options_dst.position(dst);
+            options_dst.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            // Add new marker to the Google Map Android API V2
+            map.addMarker(options_src);
+            map.addMarker(options_dst);
+            //TODO: change addr to latlng when querying directions api?
+//            String url = getDirectionsUrl(source_addr, dest_addr);
+            String url = getDirectionsUrl(src, dst);
             DownloadTask downloadTask = new DownloadTask();
-
-            // Start downloading json data from Google Directions API
             downloadTask.execute(url);
-
+//            map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(src, 15));
         }
 
         Bundle extras = getIntent().getExtras();
@@ -142,14 +164,18 @@ public class RoutesDisplay extends FragmentActivity {
 //
 //    }
 
-    private String getDirectionsUrl(String origin, String dest) {
+//    private String getDirectionsUrl(String origin, String dest) {
+    private String getDirectionsUrl(LatLng origin,LatLng dest){
 
         // Origin of route
-        String str_origin = "origin=" + origin;
+//        String str_origin = "origin=" + origin;
+//
+//        // Destination of route
+//        String str_dest = "destination=" + dest;
+        String str_origin = "origin="+origin.latitude+","+origin.longitude;
 
         // Destination of route
-        String str_dest = "destination=" + dest;
-
+        String str_dest = "destination="+dest.latitude+","+dest.longitude;
 
         // Sensor enabled
         String sensor = "sensor=false";
@@ -330,9 +356,12 @@ public class RoutesDisplay extends FragmentActivity {
                 }
 
                 lineOptions.addAll(points);
-                lineOptions.width(2);
-                lineOptions.color(Color.RED);
-
+                lineOptions.width(10);
+                lineOptions.color(Color.BLACK);
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(src);
+                builder.include(dst);
+                map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 17));
             }
 
             // Drawing polyline in the Google Map for the i-th route
