@@ -51,10 +51,12 @@ public class MainActivity extends AppCompatActivity {
     AutoCompleteTextView endLocTxt;
     AutoCompleteTextView curTxt;
     EditText mileRangeTxt;
+    String SERVER = "http://128.61.76.21:8080/RouteService/Route/getRoute?";
 
     PlacesTask placesTask_start;
     PlacesTask placesTask_end;
     ParserTask parserTask;
+    GasStationTask gasStationTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,10 +126,11 @@ public class MainActivity extends AppCompatActivity {
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+
                 String slt = startLocTxt.getText().toString();
                 String elt = endLocTxt.getText().toString();
                 String mrt = mileRangeTxt.getText().toString();
-                System.out.println("start: "+slt+",end: "+elt+",milerange: "+mrt);
+//                System.out.println("start: "+slt+",end: "+elt+",milerange: "+mrt);
                 if(slt.equals("")||elt.equals("")||mrt.equals("")){
                     //TODO: give a popup warning to complete all the fields
                     // custom dialog
@@ -150,27 +153,27 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     dialog.show();
-                    System.out.println("Please complete all the fields");
+//                    System.out.println("Please complete all the fields");
                 }
                 else {
                     float mileRange = Float.parseFloat(mrt);
 
-                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    String charset = "UTF-8";
-//                    String src = "3505 Wennington Trace, Alpharetta, GA 30004";
-//                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
-                    String src = slt;
-                    String dest = elt;
-                    String url = "";
-                    try {
-                        String query = String.format("origin_address=%s&destination_address=%s",
-                                URLEncoder.encode(src, charset),
-                                URLEncoder.encode(dest, charset));
-                        url = "http://128.61.76.21:8080/RouteService/Route/getRoute?" + query;
-                        System.out.println("");
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
+//                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+//                    String charset = "UTF-8";
+////                    String src = "3505 Wennington Trace, Alpharetta, GA 30004";
+////                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
+//                    String src = slt;
+//                    String dest = elt;
+//                    String url = "";
+//                    try {
+//                        String query = String.format("origin_address=%s&destination_address=%s",
+//                                URLEncoder.encode(src, charset),
+//                                URLEncoder.encode(dest, charset));
+//                        url = SERVER + query;
+//                        System.out.println("Successfully composed url");
+//                    } catch (Exception e) {
+//                        System.out.println(e.getMessage());
+//                    }
 
                     // Request a string response from the provided URL.
 //                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -187,52 +190,61 @@ public class MainActivity extends AppCompatActivity {
 //                            System.out.println("That didn't work!");
 //                        }
 //                    });
-                    System.out.println("requesting: ======================================");
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d("JsonObject Response",response.toString());
-                            System.out.println("======================================");
-                            try {
-                                JSONObject lat = response.getJSONObject("lat");
-                            } catch (JSONException e) {
-                                Log.d("Web Service Error",e.getMessage());
-                                System.out.println("======================================");
-                                e.printStackTrace();
-                            }
-                        }
-                    },new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Log.d("JsonObject Error",volleyError.toString());
-                            System.out.println("======================================");
-                        }
-                    });
+//                    System.out.println("requesting: ======================================");
+//                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
+//                        @Override
+//                        public void onResponse(JSONObject response) {
+//                            Log.d("JsonObject Response",response.toString());
+//                            System.out.println("======================================");
+//                            try {
+//                                JSONObject lat = response.getJSONObject("lat");
+//                            } catch (JSONException e) {
+//                                Log.d("Web Service Error",e.getMessage());
+//                                System.out.println("======================================");
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    },new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError volleyError) {
+//                            Log.d("JsonObject Error",volleyError.toString());
+//                            System.out.println("======================================");
+//                        }
+//                    });
 //                    request.setRetryPolicy(new DefaultRetryPolicy(
 //                            500000,
 //                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 //                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                    request.setRetryPolicy(new RetryPolicy() {
-                        @Override
-                        public int getCurrentTimeout() {
-                            return 50000;
-                        }
-
-                        @Override
-                        public int getCurrentRetryCount() {
-                            return 50000;
-                        }
-
-                        @Override
-                        public void retry(VolleyError error) throws VolleyError {
-
-                        }
-                    });
+//                    request.setRetryPolicy(new RetryPolicy() {
+//                        @Override
+//                        public int getCurrentTimeout() {
+//                            return 50000;
+//                        }
+//
+//                        @Override
+//                        public int getCurrentRetryCount() {
+//                            return 50000;
+//                        }
+//
+//                        @Override
+//                        public void retry(VolleyError error) throws VolleyError {
+//
+//                        }
+//                    });
                     // Add the request to the RequestQueue.
 //                    queue.add(stringRequest);
-                    queue.add(request);
+//                    queue.add(request);
+
+                    // Using Async Task to query the server
+                    gasStationTask = new GasStationTask();
+//                    gasStationTask.execute(slt,elt);
+                    gasStationTask.execute("atlanta","Marietta");
+
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+//                    goToResults.putExtra("STATION_LIST",);
+                    goToResults.putExtra("SOURCE_ADDR",slt);
+                    goToResults.putExtra("DEST_ADDR",elt);
                     startActivity(goToResults);
                 }
                 //TODO: process start and end locations
@@ -331,6 +343,38 @@ public class MainActivity extends AppCompatActivity {
 //            startLocTxt.setAdapter(adapter);
 //            endLocTxt.setAdapter(adapter);
             curTxt.setAdapter(adapter);
+        }
+    }
+
+
+    // Fetches data from our server
+    private class GasStationTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... address) {
+            String data = "";
+            String src="", dest="";
+            try {
+                src = "origin_address=" + URLEncoder.encode(address[0], "utf-8");
+                dest= "destination_address=" + URLEncoder.encode(address[1], "utf-8");
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            }
+            String url = SERVER+src+"&"+dest;
+            try{
+                data = downloadUrl(url);
+            }catch(Exception e){
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            System.out.println("========================================\ndata from our server: "+result+"\n========================================");
+//            parserTask = new ParserTask();
+//            parserTask.execute(result);
         }
     }
 
