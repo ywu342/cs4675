@@ -29,7 +29,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,6 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,12 +54,17 @@ public class MainActivity extends AppCompatActivity {
     AutoCompleteTextView endLocTxt;
     AutoCompleteTextView curTxt;
     EditText mileRangeTxt;
-    String SERVER = "http://128.61.76.21:8080/RouteService/Route/getRoute?";
+    final String SERVER = "http://128.61.76.21:8080/RouteService/Route/getRoute?";
+
+    List<LatLng> stations_coord;
+    List<String> prices_list;
 
     PlacesTask placesTask_start;
     PlacesTask placesTask_end;
     ParserTask parserTask;
     GasStationTask gasStationTask;
+    GSParserTask gsParserTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
-//                    goToResults.putExtra("STATION_LIST",);
+//                    goToResults.putExtra("PRICE_LIST",prices_list);
                     goToResults.putExtra("SOURCE_ADDR",slt);
                     goToResults.putExtra("DEST_ADDR",elt);
                     startActivity(goToResults);
@@ -373,8 +381,44 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             System.out.println("========================================\ndata from our server: "+result+"\n========================================");
-//            parserTask = new ParserTask();
-//            parserTask.execute(result);
+            gsParserTask = new GSParserTask();
+            gsParserTask.execute(result);
+        }
+    }
+
+    /** A class to parse the Gas stations in JSON format */
+    private class GSParserTask extends AsyncTask<String, Integer, List<HashMap<String,String>>>{
+
+        JSONArray jsonArray;
+
+        @Override
+        protected List<HashMap<String, String>> doInBackground(String... jsonData) {
+            List<HashMap<String, String>> stations = null;
+            GSJSONParser gsJsonParser = new GSJSONParser();
+            try{
+                jsonArray = new JSONArray(jsonData[0]);
+                stations = gsJsonParser.parse(jsonArray);
+            }catch(Exception e){
+                Log.d("Exception",e.toString());
+            }
+            return stations;
+        }
+
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> result) {
+            if(result.isEmpty()) {
+                System.out.println("NO RESULTS OF STATIONS FOUND FOR THE ROUTE");
+                return;
+            }
+            for (int i = 0; i < result.size(); i++) {
+                stations_coord = new ArrayList<LatLng>();
+                HashMap<String, String> station = result.get(i);
+                double lat = Double.parseDouble(station.get("lat"));
+                double lng = Double.parseDouble(station.get("lng"));
+                LatLng position = new LatLng(lat, lng);
+                stations_coord.add(position);
+                prices_list.add(station.get("price"));
+            }
         }
     }
 

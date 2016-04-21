@@ -153,7 +153,7 @@ public class RoutesDisplay extends FragmentActivity {
 
         // Sensor enabled
         String sensor = "sensor=false";
-        String key = "key=AIzaSyBbU5w64F7Rl2Dr_JPAWcw1tTr0WkROPHY";
+        String key = "key=AIzaSyCxqmNu0izsRuTzS0ykD1gLhLZEgCdk00I";
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor+"&"+key;
 
