@@ -20,6 +20,13 @@ import android.widget.EditText;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -143,6 +150,39 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     float mileRange = Float.parseFloat(mrt);
+
+                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                    String charset = "UTF-8";
+                    String src = "3505 Wennington Trace, Alpharetta, GA 30004";
+                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
+                    String url = "";
+                    try {
+                        String query = String.format("origin_address=%s&destination_address=%s",
+                                URLEncoder.encode(src, charset),
+                                URLEncoder.encode(dest, charset));
+                        url = "http://128.61.76.21:8080/RouteService/Route/getRoute?" + query;
+                        System.out.println("");
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    // Request a string response from the provided URL.
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    System.out.println(response);
+                                    System.out.println("Naveena");
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            System.out.println("That didn't work!");
+                        }
+                    });
+                    // Add the request to the RequestQueue.
+                    queue.add(stringRequest);
+
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
                     startActivity(goToResults);
