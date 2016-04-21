@@ -11,8 +11,8 @@
 
     <ListView
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:id="@+id/listView"
+        android:layout_height="fill_parent"
+        android:id="@+id/stationList"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -21,7 +21,7 @@
         class="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"
         android:layout_width="350dp"
-        android:layout_height="150dp"
+        android:layout_height="350dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />

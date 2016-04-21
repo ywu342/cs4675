@@ -20,13 +20,17 @@ import android.widget.EditText;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -153,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
 
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                     String charset = "UTF-8";
-                    String src = "3505 Wennington Trace, Alpharetta, GA 30004";
-                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
+//                    String src = "3505 Wennington Trace, Alpharetta, GA 30004";
+//                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
+                    String src = slt;
+                    String dest = elt;
                     String url = "";
                     try {
                         String query = String.format("origin_address=%s&destination_address=%s",
@@ -167,22 +173,64 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     // Request a string response from the provided URL.
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    System.out.println(response);
-                                    System.out.println("Naveena");
-                                }
-                            }, new Response.ErrorListener() {
+//                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//                            new Response.Listener<String>() {
+//                                @Override
+//                                public void onResponse(String response) {
+//                                    System.out.println(response);
+//                                    System.out.println("Naveena");
+//                                }
+//                            }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            System.out.println(error);
+//                            System.out.println("That didn't work!");
+//                        }
+//                    });
+                    System.out.println("requesting: ======================================");
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
                         @Override
-                        public void onErrorResponse(VolleyError error) {
-                            System.out.println("That didn't work!");
+                        public void onResponse(JSONObject response) {
+                            Log.d("JsonObject Response",response.toString());
+                            System.out.println("======================================");
+                            try {
+                                JSONObject lat = response.getJSONObject("lat");
+                            } catch (JSONException e) {
+                                Log.d("Web Service Error",e.getMessage());
+                                System.out.println("======================================");
+                                e.printStackTrace();
+                            }
+                        }
+                    },new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Log.d("JsonObject Error",volleyError.toString());
+                            System.out.println("======================================");
+                        }
+                    });
+//                    request.setRetryPolicy(new DefaultRetryPolicy(
+//                            500000,
+//                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    request.setRetryPolicy(new RetryPolicy() {
+                        @Override
+                        public int getCurrentTimeout() {
+                            return 50000;
+                        }
+
+                        @Override
+                        public int getCurrentRetryCount() {
+                            return 50000;
+                        }
+
+                        @Override
+                        public void retry(VolleyError error) throws VolleyError {
+
                         }
                     });
                     // Add the request to the RequestQueue.
-                    queue.add(stringRequest);
-
+//                    queue.add(stringRequest);
+                    queue.add(request);
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
                     startActivity(goToResults);
