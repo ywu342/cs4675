@@ -3,10 +3,13 @@ package com.example.yalingwu.internetservices;
 import android.bluetooth.le.AdvertiseData;
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -54,6 +58,8 @@ public class RoutesDisplay extends FragmentActivity {
     ArrayList<LatLng> markerPoints;
     LatLng src;
     LatLng dst;
+    LatLng[] stations_coord;
+    String[] prices_list;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -65,15 +71,72 @@ public class RoutesDisplay extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes_display);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            source_addr = extras.getString("SOURCE_ADDR");
+            dest_addr = extras.getString("DEST_ADDR");
+            //prices_list = extras.getStringArray("PRICES_LIST");
+            Parcelable[] pArr = extras.getParcelableArray("STATIONS_COORD");
+            stations_coord = new LatLng[pArr.length];
+            for (int i = 0; i < pArr.length; i++) {
+                stations_coord[i] = (LatLng) pArr[i];
+            }
+//            System.out.println(source_addr+"------------------->"+dest_addr);
+        }
+//        Polyline line = map.addPolyline(new PolylineOptions()
+//                .add(source_addr,dest_addr)
+//                .geodesic(true));
+        stationList = (ListView) findViewById(R.id.stationList);
+
+//        final StableArrayAdapter adapter = new StableArrayAdapter(this,
+//                android.R.layout.simple_list_item_1, addrList);
+//        stationList.setAdapter(adapter);
+        stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
+        stationList.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+            // updating map when clicking on station option
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view,
+                                    int position, long id) {
+                String stationAddr = (String) parent.getItemAtPosition(position);
+                LatLng stationLoc = getLocationFromAddress(stationAddr);
+                markerPoints.add(stationLoc);
+                MarkerOptions options_station = new MarkerOptions();
+                options_station.position(stationLoc);
+                options_station.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                map.addMarker(options_station);
+                String url = getDirectionsUrl(src, dst, stationLoc);
+                DownloadTask downloadTask = new DownloadTask();
+                downloadTask.execute(url);
+            }
+
+        });
+
+        //double latitude = 40.714224;
+        //double longitude = -73.961452; //Grand St/Bedford Av, Brooklyn, NY 11211, USA
+        //adding all addresses to listview
+        stations_coord[0] = new LatLng(33.77114,-84.38886);
+        //stations_coord[1] = new LatLng(33.782324, -84.389469);
+        for (int i = 0; i < stations_coord.length; i++) {
+            LocationAddress locationAddress = new LocationAddress();
+            locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
+                    getApplicationContext(), new GeocoderHandler());
+        }
+        //LocationAddress locationAddress = new LocationAddress();
+        //locationAddress.getAddressFromLocation(latitude, longitude,
+        //        getApplicationContext(), new GeocoderHandler());
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
         markerPoints = new ArrayList<LatLng>();
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_frag);
         map = fm.getMap();
         if (map != null) {
 
             map.setMyLocationEnabled(true);
-            src = new LatLng(40.714224,-73.961452);
-            dst = new LatLng(37.42245,-122.084033);
-
+            src = getLocationFromAddress(source_addr);
+            dst = getLocationFromAddress(dest_addr);
             markerPoints.add(src);
             markerPoints.add(dst);
             MarkerOptions options_src = new MarkerOptions();
@@ -87,56 +150,31 @@ public class RoutesDisplay extends FragmentActivity {
             map.addMarker(options_dst);
             //TODO: change addr to latlng when querying directions api?
 //            String url = getDirectionsUrl(source_addr, dest_addr);
-            String url = getDirectionsUrl(src, dst);
+            String url = getDirectionsUrl(src, dst, null);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
 //            map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 //            map.moveCamera(CameraUpdateFactory.newLatLngZoom(src, 15));
         }
+    }
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            source_addr = extras.getString("SOURCE_ADDR");
-            dest_addr = extras.getString("DEST_ADDR");
-//            System.out.println(source_addr+"------------------->"+dest_addr);
+    // turns address into latitude and longitude
+    private LatLng getLocationFromAddress(String strAddress) {
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        LatLng loc = null;
+        try {
+            address = coder.getFromLocationName(strAddress,1);
+            if (address == null) {
+                return null;
+            }
+            Address location=address.get(0);
+
+            loc = new LatLng(location.getLatitude(), location.getLongitude());
+        } catch (Exception e) {
+            Log.d("Exception while getting coordinates", e.getMessage());
         }
-//        Polyline line = map.addPolyline(new PolylineOptions()
-//                .add(source_addr,dest_addr)
-//                .geodesic(true));
-
-        stationList = (ListView) findViewById(R.id.stationList);
-//        final StableArrayAdapter adapter = new StableArrayAdapter(this,
-//                android.R.layout.simple_list_item_1, addrList);
-//        stationList.setAdapter(adapter);
-        stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
-//        stationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, final View view,
-//                                    int position, long id) {
-////                final String item = (String) parent.getItemAtPosition(position);
-////                System.out.println("SELECTED ITEM IN THE LIST: "+item);
-////                view.animate().setDuration(2000).alpha(0)
-////                        .withEndAction(new Runnable() {
-////                            @Override
-////                            public void run() {
-////                                addrList.remove(item);
-////                                adapter.notifyDataSetChanged();
-////                                view.setAlpha(1);
-////                            }
-////                        });
-//            }
-//
-//        });
-
-        double latitude = 40.714224;
-        double longitude = -73.961452; //Grand St/Bedford Av, Brooklyn, NY 11211, USA
-        LocationAddress locationAddress = new LocationAddress();
-        locationAddress.getAddressFromLocation(latitude, longitude,
-                getApplicationContext(), new GeocoderHandler());
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        return loc;
     }
 
 //    private class StableArrayAdapter extends ArrayAdapter<String> {
@@ -165,7 +203,7 @@ public class RoutesDisplay extends FragmentActivity {
 //    }
 
 //    private String getDirectionsUrl(String origin, String dest) {
-    private String getDirectionsUrl(LatLng origin,LatLng dest){
+    private String getDirectionsUrl(LatLng origin,LatLng dest, LatLng station){
 
         // Origin of route
 //        String str_origin = "origin=" + origin;
@@ -177,11 +215,17 @@ public class RoutesDisplay extends FragmentActivity {
         // Destination of route
         String str_dest = "destination="+dest.latitude+","+dest.longitude;
 
+        String str_waypoint = "";
+        // Waypoints of route
+        if (station != null) {
+            str_waypoint = "waypoints=optimize:true|" + station.latitude + "," + station.longitude + "&";
+        }
+
         // Sensor enabled
         String sensor = "sensor=false";
         String key = "key=AIzaSyCxqmNu0izsRuTzS0ykD1gLhLZEgCdk00I";
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor+"&"+key;
+        String parameters = str_origin + "&" + str_dest + "&" + str_waypoint + sensor+"&"+key;
 
         // Output format
         String output = "json";

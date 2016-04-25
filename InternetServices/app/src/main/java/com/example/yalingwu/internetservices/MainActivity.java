@@ -46,6 +46,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 ////                    String dest = "733 Techwood Drive Northwest, Atlanta, GA 30332";
 //                    String src = slt;
 //                    String dest = elt;
-//                    String url = "";
+                    String url = "";
 //                    try {
 //                        String query = String.format("origin_address=%s&destination_address=%s",
 //                                URLEncoder.encode(src, charset),
@@ -239,20 +242,38 @@ public class MainActivity extends AppCompatActivity {
 //
 //                        }
 //                    });
-                    // Add the request to the RequestQueue.
-//                    queue.add(stringRequest);
-//                    queue.add(request);
+                    //Add the request to the RequestQueue.
+                    //queue.add(stringRequest);
+                    //queue.add(request);
 
-                    // Using Async Task to query the server
-//                    gasStationTask = new GasStationTask();
-//                    gasStationTask.execute(slt,elt);
-//                    gasStationTask.execute("atlanta","Marietta");
-
+                    //Using Async Task to query the server
+                    gasStationTask = new GasStationTask();
+                    gasStationTask.execute(slt,elt);
+                    //gasStationTask.execute("atlanta","Marietta");
+                    try {
+                        gasStationTask.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                     //go to next screen on submit
                     Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
 //                    goToResults.putExtra("PRICE_LIST",prices_list);
                     goToResults.putExtra("SOURCE_ADDR",slt);
                     goToResults.putExtra("DEST_ADDR",elt);
+                    stations_coord = new ArrayList<LatLng>();
+                    stations_coord.add(new LatLng(33.782324, -84.389469));
+                    LatLng[] scArr = new LatLng[stations_coord.size()];
+                    //String[] strArr = new String[prices_list.size()];
+                    for (int i = 0; i < stations_coord.size(); i++) {
+                        scArr[i] = stations_coord.get(i);
+                    }
+                    //for (int i = 0; i < prices_list.size(); i++) {
+                        //strArr[i] = prices_list.get(i);
+                    //}
+                    goToResults.putExtra("STATIONS_COORD", scArr);
+                    //goToResults.putExtra("PRICES_LIST", strArr);
                     startActivity(goToResults);
                 }
                 //TODO: process start and end locations
@@ -266,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
         try{
+            System.out.println("creating connection and connecting");
             URL url = new URL(strUrl);
             // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection)url.openConnection();
@@ -279,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
             while((line = br.readLine())!= null){
                 sb.append(line);
             }
+            System.out.println("converted data buffer to string");
             data = sb.toString();
             br.close();
         }catch(Exception e){
@@ -287,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
             iStream.close();
             urlConnection.disconnect();
         }
+        System.out.println("returning from dnlw url");
         return data;
     }
 
@@ -310,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
             try{
                 data = downloadUrl(url);
+                System.out.println(data);
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
             }
@@ -363,6 +388,7 @@ public class MainActivity extends AppCompatActivity {
             String data = "";
             String src="", dest="";
             try {
+                System.out.println("getting src and dest");
                 src = "origin_address=" + URLEncoder.encode(address[0], "utf-8");
                 dest= "destination_address=" + URLEncoder.encode(address[1], "utf-8");
             } catch (UnsupportedEncodingException e1) {
@@ -370,16 +396,22 @@ public class MainActivity extends AppCompatActivity {
             }
             String url = SERVER+src+"&"+dest;
             try{
+                System.out.println("this is happening");
                 data = downloadUrl(url);
+                System.out.println("is this happening?");
+                System.out.println(data);
             }catch(Exception e){
+                System.out.println("or are we catching an exception?");
                 Log.d("Background Task", e.toString());
             }
+            System.out.println("returning data");
             return data;
         }
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            System.out.println("is onpost for gasStnTask happening?");
             System.out.println("========================================\ndata from our server: "+result+"\n========================================");
             gsParserTask = new GSParserTask();
             gsParserTask.execute(result);
@@ -396,22 +428,26 @@ public class MainActivity extends AppCompatActivity {
             List<HashMap<String, String>> stations = null;
             GSJSONParser gsJsonParser = new GSJSONParser();
             try{
+                System.out.println("parsing json array");
+                System.out.println(jsonData[0]);
                 jsonArray = new JSONArray(jsonData[0]);
                 stations = gsJsonParser.parse(jsonArray);
             }catch(Exception e){
                 Log.d("Exception",e.toString());
             }
+            System.out.println("returning stations list");
             return stations;
         }
 
         @Override
         protected void onPostExecute(List<HashMap<String, String>> result) {
-            if(result.isEmpty()) {
+            if(result == null || result.isEmpty()) {
                 System.out.println("NO RESULTS OF STATIONS FOUND FOR THE ROUTE");
                 return;
             }
+            System.out.println("creating stations coord");
+            //stations_coord = new ArrayList<LatLng>();
             for (int i = 0; i < result.size(); i++) {
-                stations_coord = new ArrayList<LatLng>();
                 HashMap<String, String> station = result.get(i);
                 double lat = Double.parseDouble(station.get("lat"));
                 double lng = Double.parseDouble(station.get("lng"));
@@ -419,6 +455,10 @@ public class MainActivity extends AppCompatActivity {
                 stations_coord.add(position);
                 prices_list.add(station.get("price"));
             }
+            System.out.println("printing stationscoord and pricelist");
+            System.out.println(stations_coord.get(0).toString());
+            System.out.println(prices_list.get(0).toString());
+
         }
     }
 

@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
