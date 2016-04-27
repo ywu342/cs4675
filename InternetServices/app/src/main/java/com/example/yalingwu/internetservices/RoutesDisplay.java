@@ -61,6 +61,7 @@ public class RoutesDisplay extends FragmentActivity {
     LatLng[] stations_coord;
     String[] prices_list;
     int Line_color = Color.BLACK;
+    Polyline selected_line;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -100,6 +101,7 @@ public class RoutesDisplay extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
+                if(selected_line!=null) selected_line.remove();
                 String stationAddr = (String) parent.getItemAtPosition(position);
                 LatLng stationLoc = getLocationFromAddress(stationAddr);
                 markerPoints.add(stationLoc);
@@ -386,7 +388,7 @@ public class RoutesDisplay extends FragmentActivity {
             }
 
             // Drawing polyline in the Google Map for the i-th route
-            if(lineOptions!=null) map.addPolyline(lineOptions);
+            if(lineOptions!=null && lineOptions.getColor()==Color.CYAN) selected_line = map.addPolyline(lineOptions);
         }
     }
 
