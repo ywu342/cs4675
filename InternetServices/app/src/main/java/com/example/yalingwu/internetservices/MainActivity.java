@@ -148,13 +148,6 @@ public class MainActivity extends AppCompatActivity {
                     final Dialog dialog = new Dialog(context);
                     dialog.setContentView(R.layout.not_complete_dial);
                     dialog.setTitle("Forgot something...");
-
-                    // set the custom dialog components - text and button
-//                    TextView text = (TextView) dialog.findViewById(R.id.dialbody);
-//                    text.setText("Please complete all the fields!");
-//                    ImageView image = (ImageView) dialog.findViewById(R.id.image);
-//                    image.setImageResource(R.drawable.ic_launcher);
-
                     Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
                     // if button is clicked, close the custom dialog
                     dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -276,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
                     //goToResults.putExtra("PRICES_LIST", strArr);
                     startActivity(goToResults);
                 }
-                //TODO: process start and end locations
             }
         });
     }
@@ -287,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
         try{
-            System.out.println("creating connection and connecting");
+//            System.out.println("creating connection and connecting");
             URL url = new URL(strUrl);
             // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection)url.openConnection();
@@ -301,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
             while((line = br.readLine())!= null){
                 sb.append(line);
             }
-            System.out.println("converted data buffer to string");
+//            System.out.println("converted data buffer to string");
             data = sb.toString();
             br.close();
         }catch(Exception e){
@@ -310,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
             iStream.close();
             urlConnection.disconnect();
         }
-        System.out.println("returning from dnlw url");
+//        System.out.println("returning from dnlw url");
         return data;
     }
 
@@ -334,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
             try{
                 data = downloadUrl(url);
-                System.out.println(data);
+//                System.out.println(data);
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
             }
@@ -373,8 +365,6 @@ public class MainActivity extends AppCompatActivity {
             int[] to = new int[] {android.R.id.text1};
             SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, android.R.layout.simple_list_item_1, from, to);
             // Setting the adapter
-//            startLocTxt.setAdapter(adapter);
-//            endLocTxt.setAdapter(adapter);
             curTxt.setAdapter(adapter);
         }
     }
@@ -396,13 +386,13 @@ public class MainActivity extends AppCompatActivity {
             }
             String url = SERVER+src+"&"+dest;
             try{
-                System.out.println("this is happening");
+//                System.out.println("this is happening");
                 data = downloadUrl(url);
                 System.out.println("is this happening?");
                 System.out.println(data);
             }catch(Exception e){
                 System.out.println("or are we catching an exception?");
-                Log.d("Background Task", e.toString());
+                Log.d("Gas station task Background Task", e.toString());
             }
             System.out.println("returning data");
             return data;
@@ -411,8 +401,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            System.out.println("is onpost for gasStnTask happening?");
-            System.out.println("========================================\ndata from our server: "+result+"\n========================================");
+//            System.out.println("is onpost for gasStnTask happening?");
+            System.out.println("==============================================\ndata from our server: "+result+"\n==============================================");
             gsParserTask = new GSParserTask();
             gsParserTask.execute(result);
         }
@@ -428,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
             List<HashMap<String, String>> stations = null;
             GSJSONParser gsJsonParser = new GSJSONParser();
             try{
-                System.out.println("parsing json array");
+                System.out.println("parsing SERVER json array");
                 System.out.println(jsonData[0]);
                 jsonArray = new JSONArray(jsonData[0]);
                 stations = gsJsonParser.parse(jsonArray);

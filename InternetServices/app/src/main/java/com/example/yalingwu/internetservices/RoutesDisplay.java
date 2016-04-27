@@ -60,6 +60,7 @@ public class RoutesDisplay extends FragmentActivity {
     LatLng dst;
     LatLng[] stations_coord;
     String[] prices_list;
+    int Line_color = Color.BLACK;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -91,6 +92,7 @@ public class RoutesDisplay extends FragmentActivity {
 //        final StableArrayAdapter adapter = new StableArrayAdapter(this,
 //                android.R.layout.simple_list_item_1, addrList);
 //        stationList.setAdapter(adapter);
+        // TODO: Scrolling of station list; navigation with google maps
         stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
         stationList.setOnItemClickListener(new ListView.OnItemClickListener() {
 
@@ -105,6 +107,7 @@ public class RoutesDisplay extends FragmentActivity {
                 options_station.position(stationLoc);
                 options_station.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 map.addMarker(options_station);
+                Line_color = Color.CYAN;
                 String url = getDirectionsUrl(src, dst, stationLoc);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
@@ -133,7 +136,6 @@ public class RoutesDisplay extends FragmentActivity {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_frag);
         map = fm.getMap();
         if (map != null) {
-
             map.setMyLocationEnabled(true);
             src = getLocationFromAddress(source_addr);
             dst = getLocationFromAddress(dest_addr);
@@ -148,7 +150,7 @@ public class RoutesDisplay extends FragmentActivity {
             // Add new marker to the Google Map Android API V2
             map.addMarker(options_src);
             map.addMarker(options_dst);
-            //TODO: change addr to latlng when querying directions api?
+            Line_color = Color.BLACK;
 //            String url = getDirectionsUrl(source_addr, dest_addr);
             String url = getDirectionsUrl(src, dst, null);
             DownloadTask downloadTask = new DownloadTask();
@@ -176,31 +178,6 @@ public class RoutesDisplay extends FragmentActivity {
         }
         return loc;
     }
-
-//    private class StableArrayAdapter extends ArrayAdapter<String> {
-//
-//        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-//
-//        public StableArrayAdapter(Context context, int textViewResourceId,
-//                                  List<String> objects) {
-//            super(context, textViewResourceId, objects);
-//            for (int i = 0; i < objects.size(); ++i) {
-//                mIdMap.put(objects.get(i), i);
-//            }
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            String item = getItem(position);
-//            return mIdMap.get(item);
-//        }
-//
-//        @Override
-//        public boolean hasStableIds() {
-//            return true;
-//        }
-//
-//    }
 
 //    private String getDirectionsUrl(String origin, String dest) {
     private String getDirectionsUrl(LatLng origin,LatLng dest, LatLng station){
@@ -342,7 +319,7 @@ public class RoutesDisplay extends FragmentActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            System.out.println("-------------------------------------\n" + "Route request response: "+result + "\n-------------------------------------");
+            System.out.println("-------------------------------------\n" + "Route request response: " + result + "\n-------------------------------------");
             ParserTask parserTask = new ParserTask();
 
             // Invokes the thread for parsing the JSON data
@@ -401,7 +378,7 @@ public class RoutesDisplay extends FragmentActivity {
 
                 lineOptions.addAll(points);
                 lineOptions.width(10);
-                lineOptions.color(Color.BLACK);
+                lineOptions.color(Line_color);
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(src);
                 builder.include(dst);
