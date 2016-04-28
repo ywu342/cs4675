@@ -169,8 +169,19 @@ public class MainActivity extends AppCompatActivity {
                     String url = "";
 
                     //Using Async Task to query the server
-                    gasStationTask = new GasStationTask();
-                    gasStationTask.execute(slt,elt, mrt);
+//                    gasStationTask = new GasStationTask();
+//                    gasStationTask.execute(slt,elt, mrt);
+
+                    /*for TEST purposes, uncommenting the above two lines when demo*/
+                    Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+                    goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
+                    goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
+                    scArr = new LatLng[1];
+                    scArr[0] = new LatLng(33.771032, -84.389376);
+                    goToResults.putExtra("STATIONS_COORD", scArr);
+                    //goToResults.putExtra("PRICES_LIST", strArr);
+                    startActivity(goToResults);
+
                 }
             }
         });
@@ -267,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
             String[] from = new String[] {"description"};
             int[] to = new int[] {android.R.id.text1};
             SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, android.R.layout.simple_list_item_1, from, to);
-            // Setting the adapter
             curTxt.setAdapter(adapter);
         }
     }

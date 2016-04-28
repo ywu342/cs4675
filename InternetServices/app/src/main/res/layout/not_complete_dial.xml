@@ -3,18 +3,19 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:clickable="true"
-    android:visibility="visible">
+    android:visibility="visible"
+    android:background="#fdfcf7">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Please complete all the fields!"
-        android:id="@+id/dialbody"
+        android:id="@+id/customdialbody"
         android:textAlignment="center"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:textSize="20dp"
-        android:textColor="#d19494"
+        android:textColor="#FF9933CC"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="20dp"
@@ -28,8 +29,8 @@
         android:textColor="#2fb326"
         android:background="#fdfcf7"
         android:layout_marginTop="49dp"
-        android:layout_below="@+id/dialbody"
-        android:layout_alignRight="@+id/dialbody"
-        android:layout_alignEnd="@+id/dialbody"
+        android:layout_below="@+id/customdialbody"
+        android:layout_alignRight="@+id/customdialbody"
+        android:layout_alignEnd="@+id/customdialbody"
         android:textSize="15dp" />
 </RelativeLayout>

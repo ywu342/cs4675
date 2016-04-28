@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class RoutesDisplay extends FragmentActivity {
     LatLng dst;
     LatLng[] stations_coord;
     String[] prices_list;
-    int Line_color = Color.BLACK;
+    int Line_color=Color.BLACK;
     Polyline selected_line;
     int selectedIndex = -1;
     /**
@@ -97,7 +98,7 @@ public class RoutesDisplay extends FragmentActivity {
 //        final StableArrayAdapter adapter = new StableArrayAdapter(this,
 //                android.R.layout.simple_list_item_1, addrList);
 //        stationList.setAdapter(adapter);
-        // TODO: Scrolling of station list; navigation with google maps
+        // TODO: Scrolling of station list
         stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
         stationList.setOnItemClickListener(new ListView.OnItemClickListener() {
 
@@ -121,16 +122,11 @@ public class RoutesDisplay extends FragmentActivity {
             }
 
         });
-
-        //stations_coord[1] = new LatLng(33.782324, -84.389469);
         for (int i = 0; i < stations_coord.length; i++) {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
                     getApplicationContext(), new GeocoderHandler());
         }
-        //LocationAddress locationAddress = new LocationAddress();
-        //locationAddress.getAddressFromLocation(latitude, longitude,
-        //        getApplicationContext(), new GeocoderHandler());
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -150,16 +146,12 @@ public class RoutesDisplay extends FragmentActivity {
             options_src.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             options_dst.position(dst);
             options_dst.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            // Add new marker to the Google Map Android API V2
             map.addMarker(options_src);
             map.addMarker(options_dst);
-            Line_color = Color.BLACK;
-//            String url = getDirectionsUrl(source_addr, dest_addr);
+            Line_color = Color.rgb(153, 51, 204);
             String url = getDirectionsUrl(src, dst, null);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
-//            map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(src, 15));
         }
 
         Button dirBtn = (Button) findViewById(R.id.dirBtn);
@@ -168,9 +160,11 @@ public class RoutesDisplay extends FragmentActivity {
             public void onClick(View view) {
                 if (selectedIndex == -1) {
                     final Dialog dialog = new Dialog(RoutesDisplay.this);
-                    dialog.setContentView(R.layout.no_option_chosen);
+                    dialog.setContentView(R.layout.not_complete_dial);
                     dialog.setTitle("Forgot something...");
                     Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                    TextView customDialogBody = (TextView) dialog.findViewById(R.id.customdialbody);
+                    customDialogBody.setText("Please Click on one Gas Station");
                     // if button is clicked, close the custom dialog
                     dialogButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -216,7 +210,6 @@ public class RoutesDisplay extends FragmentActivity {
         return loc;
     }
 
-//    private String getDirectionsUrl(String origin, String dest) {
     private String getDirectionsUrl(LatLng origin,LatLng dest, LatLng station){
 
         // Origin of route
@@ -421,9 +414,11 @@ public class RoutesDisplay extends FragmentActivity {
                 builder.include(dst);
                 map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 17));
             }
+            if(lineOptions!=null) {
+                if(lineOptions.getColor()==Color.CYAN) selected_line = map.addPolyline(lineOptions);
+                else map.addPolyline(lineOptions);
+            }
 
-            // Drawing polyline in the Google Map for the i-th route
-            if(lineOptions!=null && lineOptions.getColor()==Color.CYAN) selected_line = map.addPolyline(lineOptions);
         }
     }
 
