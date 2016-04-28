@@ -67,7 +67,6 @@ public class RoutesDisplay extends FragmentActivity {
     LatLng[] stations_coord;
     String[] prices_list;
     int Line_color=Color.BLACK;
-    final int NEW_ROUTE_COLOR = Color.rgb(22,125,145);
     Polyline selected_line;
     int selectedIndex = -1;
     /**
@@ -93,7 +92,7 @@ public class RoutesDisplay extends FragmentActivity {
         }
 
         stationList = (ListView) findViewById(R.id.stationList);
-        stationList.setVerticalScrollBarEnabled(true);
+//        stationList.setVerticalScrollBarEnabled(true);
 
 //        stationList.setOnTouchListener(new View.OnTouchListener() {
 //
