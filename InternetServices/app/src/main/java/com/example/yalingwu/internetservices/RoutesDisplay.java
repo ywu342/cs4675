@@ -1,7 +1,9 @@
 package com.example.yalingwu.internetservices;
 
+import android.app.Dialog;
 import android.bluetooth.le.AdvertiseData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -62,6 +65,7 @@ public class RoutesDisplay extends FragmentActivity {
     String[] prices_list;
     int Line_color = Color.BLACK;
     Polyline selected_line;
+    int selectedIndex = -1;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -101,6 +105,7 @@ public class RoutesDisplay extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
+                selectedIndex = position;
                 if(selected_line!=null) selected_line.remove();
                 String stationAddr = (String) parent.getItemAtPosition(position);
                 LatLng stationLoc = getLocationFromAddress(stationAddr);
@@ -117,10 +122,6 @@ public class RoutesDisplay extends FragmentActivity {
 
         });
 
-        //double latitude = 40.714224;
-        //double longitude = -73.961452; //Grand St/Bedford Av, Brooklyn, NY 11211, USA
-        //adding all addresses to listview
-        stations_coord[0] = new LatLng(33.77114,-84.38886);
         //stations_coord[1] = new LatLng(33.782324, -84.389469);
         for (int i = 0; i < stations_coord.length; i++) {
             LocationAddress locationAddress = new LocationAddress();
@@ -160,6 +161,40 @@ public class RoutesDisplay extends FragmentActivity {
 //            map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 //            map.moveCamera(CameraUpdateFactory.newLatLngZoom(src, 15));
         }
+
+        Button dirBtn = (Button) findViewById(R.id.dirBtn);
+        dirBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if (selectedIndex == -1) {
+                    final Dialog dialog = new Dialog(RoutesDisplay.this);
+                    dialog.setContentView(R.layout.no_option_chosen);
+                    dialog.setTitle("Forgot something...");
+                    Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                    // if button is clicked, close the custom dialog
+                    dialogButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    String address = (String) stationList.getItemAtPosition(selectedIndex);
+                    openGoogleService(address);
+                }
+            }
+        });
+    }
+
+    private void openGoogleService(String stationAddr) {
+        Uri anyAddress = Uri.parse("google.navigation:q=" + Uri.encode(stationAddr) + "&mode=d");
+        Intent mapI = new Intent(Intent.ACTION_VIEW, anyAddress);
+        mapI.setPackage("com.google.android.apps.maps");
+        if (mapI.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapI);
+        }
+
     }
 
     // turns address into latitude and longitude

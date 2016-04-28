@@ -14,7 +14,8 @@
         android:layout_height="fill_parent"
         android:id="@+id/stationList"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/map_frag" />
 
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,7 +23,16 @@
         android:id="@+id/map_frag"
         android:layout_width="350dp"
         android:layout_height="350dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/dirBtn" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Directions"
+        android:id="@+id/dirBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/map_frag"
+        android:layout_alignEnd="@+id/map_frag" />
 </RelativeLayout>
