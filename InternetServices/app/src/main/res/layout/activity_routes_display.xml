@@ -34,5 +34,12 @@
         android:id="@+id/dirBtn"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/map_frag"
-        android:layout_alignEnd="@+id/map_frag" />
+        android:layout_alignEnd="@+id/map_frag"
+        android:background="#167d91"
+        android:backgroundTint="#388bbf"
+        android:textColor="#f9f6f6"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:textSize="15dp" />
 </RelativeLayout>

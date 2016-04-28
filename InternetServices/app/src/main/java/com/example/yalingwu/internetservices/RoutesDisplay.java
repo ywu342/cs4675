@@ -54,6 +54,7 @@ import java.util.List;
 
 public class RoutesDisplay extends FragmentActivity {
 
+    final int NEW_ROUTE_COLOR = Color.rgb(22,125,145);
     ListView stationList;
     ArrayList<String> addrList = new ArrayList<String>();
     String source_addr;
@@ -115,7 +116,7 @@ public class RoutesDisplay extends FragmentActivity {
                 options_station.position(stationLoc);
                 options_station.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 map.addMarker(options_station);
-                Line_color = Color.CYAN;
+                Line_color = NEW_ROUTE_COLOR;
                 String url = getDirectionsUrl(src, dst, stationLoc);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
@@ -164,7 +165,7 @@ public class RoutesDisplay extends FragmentActivity {
                     dialog.setTitle("Forgot something...");
                     Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
                     TextView customDialogBody = (TextView) dialog.findViewById(R.id.customdialbody);
-                    customDialogBody.setText("Please Click on one Gas Station");
+                    customDialogBody.setText("Please click on one gas station to continue");
                     // if button is clicked, close the custom dialog
                     dialogButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -415,7 +416,7 @@ public class RoutesDisplay extends FragmentActivity {
                 map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 17));
             }
             if(lineOptions!=null) {
-                if(lineOptions.getColor()==Color.CYAN) selected_line = map.addPolyline(lineOptions);
+                if(lineOptions.getColor()==NEW_ROUTE_COLOR) selected_line = map.addPolyline(lineOptions);
                 else map.addPolyline(lineOptions);
             }
 
