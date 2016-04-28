@@ -55,6 +55,7 @@ import java.util.List;
 
 public class RoutesDisplay extends FragmentActivity {
 
+    final int NEW_ROUTE_COLOR = Color.rgb(22,125,145);
     ListView stationList;
     ArrayList<String> addrList = new ArrayList<String>();
     String source_addr;

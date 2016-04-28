@@ -10,15 +10,12 @@
     tools:context="com.example.yalingwu.internetservices.RoutesDisplay">
 
     <ListView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:id="@+id/stationList"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/map_frag"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="fill_vertical"
-        android:scrollbars="vertical" />
+        android:layout_above="@+id/map_frag" />
 
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -41,9 +38,7 @@
         android:background="#167d91"
         android:backgroundTint="#388bbf"
         android:textColor="#f9f6f6"
-        android:layout_alignParentTop="false"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="10dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:textSize="15dp" />
