@@ -169,20 +169,18 @@ public class MainActivity extends AppCompatActivity {
                     String url = "";
 
                     //Using Async Task to query the server
-//                    gasStationTask = new GasStationTask();
-//                    gasStationTask.execute(slt,elt, mrt);
+                    gasStationTask = new GasStationTask();
+                    gasStationTask.execute(slt,elt, mrt);
 
                     /*for TEST purposes, uncomment the above two lines when demo*/
-                    Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
-                    goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
-                    goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
-                    scArr = new LatLng[1];
-                    scArr[0] = new LatLng(33.771032, -84.389376);
-//                    scArr[1] = new LatLng(29.247502, -81.074517); //publix
-//                    scArr[2] = new LatLng(33.777554, -84.388116); //biltmore
-                    goToResults.putExtra("STATIONS_COORD", scArr);
-                    //goToResults.putExtra("PRICES_LIST", strArr);
-                    startActivity(goToResults);
+//                    Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+//                    goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
+//                    goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
+//                    scArr = new LatLng[1];
+//                    scArr[0] = new LatLng(33.771032, -84.389376);
+//                    goToResults.putExtra("STATIONS_COORD", scArr);
+//                    //goToResults.putExtra("PRICES_LIST", strArr);
+//                    startActivity(goToResults);
 
                 }
             }
@@ -378,8 +376,6 @@ public class MainActivity extends AppCompatActivity {
             goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
             scArr = new LatLng[1];
             scArr[0] = new LatLng(33.771032, -84.389376);
-//            scArr[1] = new LatLng(29.247502, -81.074517); //publix
-//            scArr[2] = new LatLng(33.777554, -84.388116); //biltmore
             goToResults.putExtra("STATIONS_COORD", scArr);
             //goToResults.putExtra("PRICES_LIST", strArr);
             startActivity(goToResults);

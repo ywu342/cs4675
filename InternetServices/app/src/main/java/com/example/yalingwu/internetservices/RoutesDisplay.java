@@ -92,19 +92,15 @@ public class RoutesDisplay extends FragmentActivity {
         }
 
         stationList = (ListView) findViewById(R.id.stationList);
-//        stationList.setVerticalScrollBarEnabled(true);
 
-//        stationList.setOnTouchListener(new View.OnTouchListener() {
-//
-//            public boolean onTouch(View v, MotionEvent event) {
-//                return (event.getAction() == MotionEvent.ACTION_MOVE);
-//            }
-//        });
+//        addrList.add("Test");
+//        addrList.add("TEST");
+//        addrList.add("TEsT");
+        stationList.setVerticalScrollBarEnabled(true);
 
 //        final StableArrayAdapter adapter = new StableArrayAdapter(this,
 //                android.R.layout.simple_list_item_1, addrList);
 //        stationList.setAdapter(adapter);
-        // TODO: Scrolling of station list
         stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
         stationList.setOnItemClickListener(new ListView.OnItemClickListener() {
 
