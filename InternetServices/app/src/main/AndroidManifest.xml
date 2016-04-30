@@ -57,15 +57,15 @@
             android:protectionLevel="signature"/>
         <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
 
-        <!--<activity-->
-            <!--android:name=".SplashActivity"-->
-            <!--android:theme="@style/SplashTheme">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

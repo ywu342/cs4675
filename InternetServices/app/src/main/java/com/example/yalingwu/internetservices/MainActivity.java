@@ -348,14 +348,19 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<HashMap<String, String>> result) {
             if(result == null || result.isEmpty()) {
                 System.out.println("NO RESULTS OF STATIONS FOUND FOR THE ROUTE");
-                Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
-                goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
-                goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
-                scArr = new LatLng[1];
-                scArr[0] = new LatLng(33.771032, -84.389376);
-                goToResults.putExtra("STATIONS_COORD", scArr);
-                //goToResults.putExtra("PRICES_LIST", strArr);
-                startActivity(goToResults);
+                final Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.no_results);
+                dialog.setTitle("Forgot something...");
+                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                // if button is clicked, close the custom dialog
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                return;
             }
             System.out.println("creating stations coord");
             stations_coord = new ArrayList<LatLng>();
@@ -374,8 +379,8 @@ public class MainActivity extends AppCompatActivity {
             Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
             goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
             goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
-            scArr = new LatLng[1];
-            scArr[0] = new LatLng(33.771032, -84.389376);
+            //scArr = new LatLng[1];
+            //scArr[0] = new LatLng(33.771032, -84.389376);
             goToResults.putExtra("STATIONS_COORD", scArr);
             //goToResults.putExtra("PRICES_LIST", strArr);
             startActivity(goToResults);
