@@ -78,6 +78,8 @@ public class RoutesDisplay extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        long time= System.currentTimeMillis();
+        android.util.Log.i("Time Class ", " At start of the second screen: Time value in millisecinds " + time);
         setContentView(R.layout.activity_routes_display);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -116,10 +118,13 @@ public class RoutesDisplay extends FragmentActivity {
             }
 
         });
+        long listTime;
         for (int i = 0; i < stations_coord.length; i++) {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
                     getApplicationContext(), new GeocoderHandler());
+            listTime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the " + i + "th list item: Time value in millisecinds " + listTime);
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -152,6 +157,8 @@ public class RoutesDisplay extends FragmentActivity {
         dirBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After clicking direction button: Time value in millisecinds "+time);
                 if (selectedIndex == -1) {
                     final Dialog dialog = new Dialog(RoutesDisplay.this);
                     dialog.setContentView(R.layout.not_complete_dial);
@@ -372,7 +379,8 @@ public class RoutesDisplay extends FragmentActivity {
                 if(lineOptions.getColor()==NEW_ROUTE_COLOR) selected_line = map.addPolyline(lineOptions);
                 else map.addPolyline(lineOptions);
             }
-
+            long time= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the main polyline: Time value in millisecinds "+time);
         }
     }
 

@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        long time= System.currentTimeMillis();
+        android.util.Log.i("Time Class ", " At start of the first screen: Time value in millisecinds "+time);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -141,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After clicking submit button: Time value in millisecinds "+time);
                 String slt = startLocTxt.getText().toString();
                 String elt = endLocTxt.getText().toString();
                 String mrt = mileRangeTxt.getText().toString();
