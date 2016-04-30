@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 String slt = startLocTxt.getText().toString();
                 String elt = endLocTxt.getText().toString();
                 String mrt = mileRangeTxt.getText().toString();
-//                System.out.println("start: "+slt+",end: "+elt+",milerange: "+mrt);
                 if(slt.equals("")||elt.equals("")||mrt.equals("")){
                     //TODO: give a popup warning to complete all the fields
                     // custom dialog
@@ -161,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     dialog.show();
-//                    System.out.println("Please complete all the fields");
                 }
                 else {
                     //float mileRange = Float.parseFloat(mrt);
@@ -193,13 +191,9 @@ public class MainActivity extends AppCompatActivity {
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
         try{
-//            System.out.println("creating connection and connecting");
             URL url = new URL(strUrl);
-            // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection)url.openConnection();
-            // Connecting to url
             urlConnection.connect();
-            // Reading data from url
             iStream = urlConnection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
             StringBuffer sb  = new StringBuffer();
@@ -207,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
             while((line = br.readLine())!= null){
                 sb.append(line);
             }
-//            System.out.println("converted data buffer to string");
             data = sb.toString();
             br.close();
         }catch(Exception e){
@@ -216,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
             iStream.close();
             urlConnection.disconnect();
         }
-//        System.out.println("returning from dnlw url");
         return data;
     }
 
@@ -240,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
             try{
                 data = downloadUrl(url);
-//                System.out.println(data);
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
             }
@@ -300,12 +291,9 @@ public class MainActivity extends AppCompatActivity {
             }
             String url = SERVER + src + "&" + dest + "&" + miles;
             try{
-//                System.out.println("this is happening");
                 data = downloadUrl(url);
-                System.out.println("is this happening?");
                 System.out.println(data);
             }catch(Exception e){
-                System.out.println("or are we catching an exception?");
                 Log.d("Gas station task Background Task", e.toString());
             }
             System.out.println("returning data");
