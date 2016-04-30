@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         long time= System.currentTimeMillis();
-        android.util.Log.i("Time Class ", " At start of the first screen: Time value in millisecinds "+time);
+        android.util.Log.i("Time Class ", " At start of the first screen: Time value in milliseconds " + time);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 long time= System.currentTimeMillis();
-                android.util.Log.i("Time Class ", " After clicking submit button: Time value in millisecinds "+time);
+                android.util.Log.i("Time Class ", " When user clicks submit button: Time value in milliseconds "+time);
                 String slt = startLocTxt.getText().toString();
                 String elt = endLocTxt.getText().toString();
                 String mrt = mileRangeTxt.getText().toString();
@@ -195,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
         HttpURLConnection urlConnection = null;
         try{
             URL url = new URL(strUrl);
+            long time= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", "When URL connection starts: Time value in milliseconds " + time);
             urlConnection = (HttpURLConnection)url.openConnection();
             urlConnection.connect();
             iStream = urlConnection.getInputStream();
@@ -211,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
         }finally{
             iStream.close();
             urlConnection.disconnect();
+            long time= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", "When URL connection closes: Time value in milliseconds " + time);
         }
         return data;
     }
@@ -338,43 +342,52 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<HashMap<String, String>> result) {
             if(result == null || result.isEmpty()) {
-                System.out.println("NO RESULTS OF STATIONS FOUND FOR THE ROUTE");
-                final Dialog dialog = new Dialog(context);
-                dialog.setContentView(R.layout.no_results);
-                dialog.setTitle("Forgot something...");
-                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
-                // if button is clicked, close the custom dialog
-                dialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                return;
+//                System.out.println("NO RESULTS OF STATIONS FOUND FOR THE ROUTE");
+//                final Dialog dialog = new Dialog(context);
+//                dialog.setContentView(R.layout.no_results);
+//                dialog.setTitle("Forgot something...");
+//                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+//                // if button is clicked, close the custom dialog
+//                dialogButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//                dialog.show();
+//                return;
+                Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+                goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
+                goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
+                scArr = new LatLng[1];
+                scArr[0] = new LatLng(33.771032, -84.389376);
+                goToResults.putExtra("STATIONS_COORD", scArr);
+                //goToResults.putExtra("PRICES_LIST", strArr);
+                startActivity(goToResults);
+            } else {
+                System.out.println("creating stations coord");
+                stations_coord = new ArrayList<LatLng>();
+                for (int i = 0; i < result.size(); i++) {
+                    HashMap<String, String> station = result.get(i);
+                    double lat = Double.parseDouble(station.get("lat"));
+                    double lng = Double.parseDouble(station.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+                    stations_coord.add(position);
+                    //prices_list.add(station.get("price"));
+                }
+                scArr = new LatLng[stations_coord.size()];
+                for (int i = 0; i < stations_coord.size(); i++) {
+                    scArr[i] = stations_coord.get(i);
+                }
+                Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
+                goToResults.putExtra("SOURCE_ADDR", startLocTxt.getText().toString());
+                goToResults.putExtra("DEST_ADDR", endLocTxt.getText().toString());
+                //scArr = new LatLng[1];
+                //scArr[0] = new LatLng(33.771032, -84.389376);
+                goToResults.putExtra("STATIONS_COORD", scArr);
+                //goToResults.putExtra("PRICES_LIST", strArr);
+                startActivity(goToResults);
             }
-            System.out.println("creating stations coord");
-            stations_coord = new ArrayList<LatLng>();
-            for (int i = 0; i < result.size(); i++) {
-                HashMap<String, String> station = result.get(i);
-                double lat = Double.parseDouble(station.get("lat"));
-                double lng = Double.parseDouble(station.get("lng"));
-                LatLng position = new LatLng(lat, lng);
-                stations_coord.add(position);
-                //prices_list.add(station.get("price"));
-            }
-            scArr = new LatLng[stations_coord.size()];
-            for (int i = 0; i < stations_coord.size(); i++) {
-                scArr[i] = stations_coord.get(i);
-            }
-            Intent goToResults = new Intent(MainActivity.this, RoutesDisplay.class);
-            goToResults.putExtra("SOURCE_ADDR",startLocTxt.getText().toString());
-            goToResults.putExtra("DEST_ADDR",endLocTxt.getText().toString());
-            //scArr = new LatLng[1];
-            //scArr[0] = new LatLng(33.771032, -84.389376);
-            goToResults.putExtra("STATIONS_COORD", scArr);
-            //goToResults.putExtra("PRICES_LIST", strArr);
-            startActivity(goToResults);
         }
     }
 
