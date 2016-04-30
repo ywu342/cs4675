@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # Copyright (c) Georgia Instituted of Technology
-# Author: C. Chen
+# Author: C. Chen, H. Tang
 # Script functionality description
 # Create time: 2016-04-17 17:04:50
 
 import googlemaps
+import MySQLdb
 # from datetime import datetime
 import requests
-#import pdb
+import pdb
 import operator
 import sys
 import json
@@ -22,9 +23,54 @@ FULL = 20
 # miles per gallon
 MPG = 21.1
 
-GOOGLE_KEY = 'AIzaSyD7h9vtiIZyIpnLdCh7mMAZ8MMwDWiFOzg'
+GOOGLE_KEY = 'AIzaSyDiIGEtWebcQxHSWIKzyS6J1H4HFfpomtY'
 myGasFeedUrl = 'http://devapi.mygasfeed.com/'
 myGasFeedKey = 'rfej9napna'
+
+def get_station_price(lat,lng):
+    price = None
+    # query will be used to retrieve data from the database
+    query = "SELECT price FROM GasPrice WHERE lat=%s and lng=%s"
+    # open a database connection
+    # potentially leakage of the password for the database, shall be encrypted and then stored and accept input from users
+    connection = MySQLdb.connect (host = "localhost", user = "root", passwd = "", db = "RouteServiceDB")
+    # prepare a cursor object using cursor() method
+    cursor = connection.cursor ()
+    # execute the SQL query using execute() method.
+    cursor.execute (query, (float(lat), float(lng)))
+    # fill the graph for this part of data
+    for temp in cursor:
+        price = temp[0]
+    # close the cursor object
+    cursor.close ()
+    # close the connection
+    connection.close ()
+    return price
+
+def update_station_price(lat,lng,price):
+    # query will be used to retrieve data from the database
+    query = "INSERT INTO GasPrice (price,lat,lng) VALUES (%s,%s,%s)"
+    # open a database connection
+    # potentially leakage of the password for the database, shall be encrypted and then stored and accept input from users
+    connection = MySQLdb.connect (host = "localhost", user = "root", passwd = "", db = "RouteServiceDB")
+    # prepare a cursor object using cursor() method
+    cursor = connection.cursor ()
+    # execute the SQL query using execute() method.
+    cursor.execute (query, (float(price), float(lat), float(lng)))
+    # close the cursor object
+    cursor.close ()
+    # close the connection
+    connection.close ()
+
+def deunicodify_hook(pairs):
+    new_pairs = []
+    for key, value in pairs: 
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+        new_pairs.append((key, value))
+    return dict(new_pairs)
 
 # urlGenerate: generate url to get price for
 # a gas station.
@@ -47,31 +93,39 @@ def url_generate(location, fuel_type='reg', distance=0.2):
 # dict {'lat':value, 'lng':value}
 def get_price(stations):
     result=list()
-    item = dict()
+    
     for station in stations:
-        url = url_generate(station)
-        response = requests.get(url)
-        content = response.content.split('</pre></div></pre>')[-1]
-        data = json.loads(content)
-        try:
-            data = json.loads(content)
-        except:
-            sys.exit('error with transferring data to json:\n %s' % content)
-        status = data['status']['error']
-        if status != 'NO':
-            sys.exit('error with getting price data:\n %s' % content)
-        gas_stations = data['stations']
-
-
         item = station.copy()
-        for tmp in gas_stations:
-            #print tmp['id'], tmp['reg_price'], \
-            #        tmp['lat'], tmp['lng'], tmp['address']
-            if tmp['id'] in str(result):
-                continue
-            item['id'] = tmp['id']
-            item['price'] = float(tmp['reg_price'])
-            break
+        price = get_station_price(station['lat'], station['lng']);
+        if price is None:
+            url = url_generate(station)
+            response = requests.get(url)
+            content = response.content.split('</pre></div></pre>')[-1]
+            data = json.loads(content, object_pairs_hook=deunicodify_hook)
+            try:
+                data = json.loads(content, object_pairs_hook=deunicodify_hook)
+            except:
+                sys.exit('error with transferring data to json:\n %s' % content)
+            status = data['status']['error']
+            if status != 'NO':
+                sys.exit('error with getting price data:\n %s' % content)
+            gas_stations = data['stations']
+
+
+            for tmp in gas_stations:
+                #print tmp['id'], tmp['reg_price'], \
+                #        tmp['lat'], tmp['lng'], tmp['address']
+                if tmp['id'] in str(result):
+                    continue
+                item['id'] = tmp['id']
+                try:
+                    item['price'] = float(tmp['reg_price'])
+                    update_station_price(station['lat'], station['lng'], item['price'], item['id'], item['key'])
+                except:
+                    gas_stations.remove(tmp)
+                break
+        else:
+            item['price'] = price
 
         if 'price' in str(item):
             result.append(item.copy())
@@ -343,37 +397,41 @@ def naive(stations, i, g, mpg):
 '''
 test program
 '''
-def main():
+def main(fpath, start, dst, alg = 1):
     #start = '2232 Dunseath AVE NW, Atlanta, GA, 30318'
     #dst   = '5116 Highland Road, Baton Rouge, LA'
-    start = 'Atlanta, GA'
-    dst   = 'Marietta, GA'
+    #start = 'Atlanta, GA'
+    #dst   = 'Marietta, GA'
 
     #pdb.set_trace()
     try:
-        fh = open('location.txt', 'r')
+        fh = open(fpath, 'r')
     except:
         sys.exit('open file error')
     data = fh.read()
+    #pdb.set_trace()
     fh.close()
-    stations = [dict(t) for t in set([tuple(d.items()) for d in json.loads(data)])]
-    #stations = json.loads(data)
-    #for i in range(len(stations)):
-    #    print i+1, stations[i]
+    stations = [dict(t) for t in set([tuple(d.items()) for d in
+        json.loads(data, object_pairs_hook=deunicodify_hook)])]
 
     #pdb.set_trace()
     stations = filter(start, dst, stations, 0.6)
     #pdb.set_trace()
     stations = get_price(stations)
     #pdb.set_trace()
-    for i in range(len(stations)):
-        print i+1, stations[i]
+    #for i in range(len(stations)):
+    #    print i+1, stations[i]
     #[lst1, cost1] = n_stop(stations, 0, 1.9, 4, MPG)
-    [lst, cost] = naive(stations, 0, 1.9, MPG)
+    if alg == 1:
+        [lst, cost] = naive(stations, 0, 1.9, MPG)
+    elif alg == 2:
+        [lst, cost] = n_stop(stations, 0, 1.9, 4, MPG)
+    elif alg == 3:
+        [lst, cost] = advanced_n_stop(stations, 0, 1.9, 4, MPG)
     #[lst3, cost3] = advanced_n_stop(stations, 0, 1.9, 4, MPG)
     lst.reverse()
     result =[stations[i-1] for i in lst]
-    print lst
+    #print lst
     print result
     '''
     print 'result of simple:'
@@ -388,4 +446,8 @@ def main():
     '''
 
 if __name__ == '__main__':
-    main()
+    fpath = sys.argv[1]
+    start = sys.argv[2]
+    dest = sys.argv[3]
+    alg = sys.argv[4]
+    main(fpath, start, dest, int(alg))
