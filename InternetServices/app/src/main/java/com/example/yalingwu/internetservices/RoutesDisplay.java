@@ -78,6 +78,8 @@ public class RoutesDisplay extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        long time= System.currentTimeMillis();
+        android.util.Log.i("Time Class ", " At start of the second screen: Time value in millisecinds " + time);
         setContentView(R.layout.activity_routes_display);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -92,15 +94,7 @@ public class RoutesDisplay extends FragmentActivity {
         }
 
         stationList = (ListView) findViewById(R.id.stationList);
-
-//        addrList.add("Test");
-//        addrList.add("TEST");
-//        addrList.add("TEsT");
         stationList.setVerticalScrollBarEnabled(true);
-
-//        final StableArrayAdapter adapter = new StableArrayAdapter(this,
-//                android.R.layout.simple_list_item_1, addrList);
-//        stationList.setAdapter(adapter);
         stationList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, addrList));
         stationList.setOnItemClickListener(new ListView.OnItemClickListener() {
 
@@ -124,10 +118,13 @@ public class RoutesDisplay extends FragmentActivity {
             }
 
         });
+        long listTime;
         for (int i = 0; i < stations_coord.length; i++) {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
                     getApplicationContext(), new GeocoderHandler());
+            listTime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the " + i + "th list item: Time value in millisecinds " + listTime);
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -160,6 +157,8 @@ public class RoutesDisplay extends FragmentActivity {
         dirBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After clicking direction button: Time value in millisecinds "+time);
                 if (selectedIndex == -1) {
                     final Dialog dialog = new Dialog(RoutesDisplay.this);
                     dialog.setContentView(R.layout.not_complete_dial);
@@ -204,7 +203,6 @@ public class RoutesDisplay extends FragmentActivity {
                 return null;
             }
             Address location=address.get(0);
-
             loc = new LatLng(location.getLatitude(), location.getLongitude());
         } catch (Exception e) {
             Log.d("Exception while getting coordinates", e.getMessage());
@@ -214,14 +212,7 @@ public class RoutesDisplay extends FragmentActivity {
 
     private String getDirectionsUrl(LatLng origin,LatLng dest, LatLng station){
 
-        // Origin of route
-//        String str_origin = "origin=" + origin;
-//
-//        // Destination of route
-//        String str_dest = "destination=" + dest;
         String str_origin = "origin="+origin.latitude+","+origin.longitude;
-
-        // Destination of route
         String str_dest = "destination="+dest.latitude+","+dest.longitude;
 
         String str_waypoint = "";
@@ -229,19 +220,11 @@ public class RoutesDisplay extends FragmentActivity {
         if (station != null) {
             str_waypoint = "waypoints=optimize:true|" + station.latitude + "," + station.longitude + "&";
         }
-
-        // Sensor enabled
         String sensor = "sensor=false";
         String key = "key=AIzaSyCxqmNu0izsRuTzS0ykD1gLhLZEgCdk00I";
-        // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + str_waypoint + sensor+"&"+key;
-
-        // Output format
         String output = "json";
-
-        // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
         return url;
     }
 
@@ -254,29 +237,17 @@ public class RoutesDisplay extends FragmentActivity {
         HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
             urlConnection.connect();
-
-            // Reading data from url
             iStream = urlConnection.getInputStream();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
             StringBuffer sb = new StringBuffer();
-
             String line = "";
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
-
             data = sb.toString();
-
             br.close();
-
         } catch (Exception e) {
             Log.d("Exception while downloading url", e.toString());
         } finally {
@@ -330,15 +301,10 @@ public class RoutesDisplay extends FragmentActivity {
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
-        // Downloading data in non-ui thread
         @Override
         protected String doInBackground(String... url) {
-
-            // For storing data from web service
             String data = "";
-
             try {
-                // Fetching the data from web service
                 data = downloadUrl(url[0]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
@@ -346,22 +312,18 @@ public class RoutesDisplay extends FragmentActivity {
             return data;
         }
 
-        // Executes in UI thread, after the execution of
-        // doInBackground()
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             System.out.println("-------------------------------------\n" + "Route request response: " + result + "\n-------------------------------------");
             ParserTask parserTask = new ParserTask();
-
-            // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
 
         }
     }
 
     /**
-     * A class to parse the Google Places in JSON format
+     * A class to parse the Google Directions in JSON format
      */
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
@@ -374,7 +336,6 @@ public class RoutesDisplay extends FragmentActivity {
             try {
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-                // Starts parsing data
                 routes = parser.parse(jObject);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -394,8 +355,6 @@ public class RoutesDisplay extends FragmentActivity {
             for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList<LatLng>();
                 lineOptions = new PolylineOptions();
-
-                // Fetching i-th route
                 List<HashMap<String, String>> path = result.get(i);
 
                 for (int j = 0; j < path.size(); j++) {
@@ -420,7 +379,8 @@ public class RoutesDisplay extends FragmentActivity {
                 if(lineOptions.getColor()==NEW_ROUTE_COLOR) selected_line = map.addPolyline(lineOptions);
                 else map.addPolyline(lineOptions);
             }
-
+            long time= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the main polyline: Time value in millisecinds "+time);
         }
     }
 
