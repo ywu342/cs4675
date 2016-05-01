@@ -69,6 +69,7 @@ public class RoutesDisplay extends FragmentActivity {
     int Line_color=Color.BLACK;
     Polyline selected_line;
     int selectedIndex = -1;
+    int counter = 0;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -102,6 +103,8 @@ public class RoutesDisplay extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After clicking on one list item: Time value in millisecinds "+time);
                 selectedIndex = position;
                 if(selected_line!=null) selected_line.remove();
                 String stationAddr = (String) parent.getItemAtPosition(position);
@@ -113,18 +116,19 @@ public class RoutesDisplay extends FragmentActivity {
                 map.addMarker(options_station);
                 Line_color = NEW_ROUTE_COLOR;
                 String url = getDirectionsUrl(src, dst, stationLoc);
+                long routetime_1= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " About to ask for the src-gas-dst route: Time value in millisecinds " + routetime_1);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
             }
 
         });
-        long listTime;
+//        long listTime;
         for (int i = 0; i < stations_coord.length; i++) {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
                     getApplicationContext(), new GeocoderHandler());
-            listTime= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " After the " + i + "th list item: Time value in millisecinds " + listTime);
+
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -137,7 +141,7 @@ public class RoutesDisplay extends FragmentActivity {
             map.setMyLocationEnabled(true);
             src = getLocationFromAddress(source_addr);
             dst = getLocationFromAddress(dest_addr);
-            System.out.print("src: "+src.toString()+"\ndst: "+dst.toString());
+            System.out.println("src: " + src.toString() + "\ndst: " + dst.toString());
             markerPoints.add(src);
             markerPoints.add(dst);
             MarkerOptions options_src = new MarkerOptions();
@@ -155,6 +159,8 @@ public class RoutesDisplay extends FragmentActivity {
             }
             Line_color = Color.rgb(153, 51, 204);
             String url = getDirectionsUrl(src, dst, null);
+            long routetime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " About to ask for the src-dst route: Time value in millisecinds " + routetime);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
         }
@@ -327,7 +333,10 @@ public class RoutesDisplay extends FragmentActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            System.out.println("-------------------------------------\n" + "Route request response: " + result + "\n-------------------------------------");
+            /**
+             * for performance analysis purpose: commenting out printing system out
+             */
+//            System.out.println("-------------------------------------\n" + "Route request response: " + result + "\n-------------------------------------");
             ParserTask parserTask = new ParserTask();
             parserTask.execute(result);
 
@@ -365,6 +374,15 @@ public class RoutesDisplay extends FragmentActivity {
             MarkerOptions markerOptions = new MarkerOptions();
             if(result==null||result.isEmpty()) {
                 System.out.println("NO RESULTS FOUND FOR THE ROUTE");
+                /**
+                 * for performance analysis purpose: generating a random route
+                 */
+                Polyline line = map.addPolyline(new PolylineOptions()
+                        .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+                        .width(5)
+                        .color(Color.RED));
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After the test polyline is drawn: Time value in millisecinds "+time);
                 return;
             }
             for (int i = 0; i < result.size(); i++) {
@@ -413,6 +431,8 @@ public class RoutesDisplay extends FragmentActivity {
             }
             addrList.add(locationAddress);
             ((BaseAdapter) stationList.getAdapter()).notifyDataSetChanged();
+            long listTime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the " + counter++ + "th list item update: Time value in millisecinds " + listTime);
         }
     }
 }
