@@ -80,7 +80,7 @@ public class RoutesDisplay extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         long time= System.currentTimeMillis();
-        android.util.Log.i("Time Class ", " At start of the second screen: Time value in millisecinds " + time);
+        android.util.Log.i("Time Class ", " At start of the second screen: Time value in milliseconds " + time);
         setContentView(R.layout.activity_routes_display);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -104,7 +104,7 @@ public class RoutesDisplay extends FragmentActivity {
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
                 long time= System.currentTimeMillis();
-                android.util.Log.i("Time Class ", " After clicking on one list item: Time value in millisecinds "+time);
+                android.util.Log.i("Time Class ", " After clicking on one list item: Time value in milliseconds "+time);
                 selectedIndex = position;
                 if(selected_line!=null) selected_line.remove();
                 String stationAddr = (String) parent.getItemAtPosition(position);
@@ -117,7 +117,7 @@ public class RoutesDisplay extends FragmentActivity {
                 Line_color = NEW_ROUTE_COLOR;
                 String url = getDirectionsUrl(src, dst, stationLoc);
                 long routetime_1= System.currentTimeMillis();
-                android.util.Log.i("Time Class ", " About to ask for the src-gas-dst route: Time value in millisecinds " + routetime_1);
+                android.util.Log.i("Time Class ", " About to ask for the src-gas-dst route: Time value in milliseconds " + routetime_1);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
             }
@@ -141,7 +141,7 @@ public class RoutesDisplay extends FragmentActivity {
             map.setMyLocationEnabled(true);
             src = getLocationFromAddress(source_addr);
             dst = getLocationFromAddress(dest_addr);
-            System.out.println("src: " + src.toString() + "\ndst: " + dst.toString());
+//            System.out.println("src: " + src.toString() + "\ndst: " + dst.toString());
             markerPoints.add(src);
             markerPoints.add(dst);
             MarkerOptions options_src = new MarkerOptions();
@@ -160,7 +160,7 @@ public class RoutesDisplay extends FragmentActivity {
             Line_color = Color.rgb(153, 51, 204);
             String url = getDirectionsUrl(src, dst, null);
             long routetime= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " About to ask for the src-dst route: Time value in millisecinds " + routetime);
+            android.util.Log.i("Time Class ", " About to ask for the src-dst route: Time value in milliseconds " + routetime);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
         }
@@ -170,7 +170,7 @@ public class RoutesDisplay extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 long time= System.currentTimeMillis();
-                android.util.Log.i("Time Class ", " After clicking direction button: Time value in millisecinds "+time);
+                android.util.Log.i("Time Class ", " After clicking direction button: Time value in milliseconds "+time);
                 if (selectedIndex == -1) {
                     final Dialog dialog = new Dialog(RoutesDisplay.this);
                     dialog.setContentView(R.layout.not_complete_dial);
@@ -382,7 +382,7 @@ public class RoutesDisplay extends FragmentActivity {
                         .width(5)
                         .color(Color.RED));
                 long time= System.currentTimeMillis();
-                android.util.Log.i("Time Class ", " After the test polyline is drawn: Time value in millisecinds "+time);
+                android.util.Log.i("Time Class ", " After the test polyline is drawn: Time value in milliseconds " + time);
                 return;
             }
             for (int i = 0; i < result.size(); i++) {
@@ -413,7 +413,7 @@ public class RoutesDisplay extends FragmentActivity {
                 else map.addPolyline(lineOptions);
             }
             long time= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " After the polyline: Time value in millisecinds "+time);
+            android.util.Log.i("Time Class ", " After the polyline: Time value in milliseconds "+time);
         }
     }
 
@@ -432,7 +432,7 @@ public class RoutesDisplay extends FragmentActivity {
             addrList.add(locationAddress);
             ((BaseAdapter) stationList.getAdapter()).notifyDataSetChanged();
             long listTime= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " After the " + counter++ + "th list item update: Time value in millisecinds " + listTime);
+            android.util.Log.i("Time Class ", " After the " + counter++ + "th list item update: Time value in milliseconds " + listTime);
         }
     }
 }
