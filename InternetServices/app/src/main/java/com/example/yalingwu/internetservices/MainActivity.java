@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 String elt = endLocTxt.getText().toString();
                 String mrt = mileRangeTxt.getText().toString();
                 if(slt.equals("")||elt.equals("")||mrt.equals("")){
-                    //TODO: give a popup warning to complete all the fields
                     // custom dialog
                     final Dialog dialog = new Dialog(context);
                     dialog.setContentView(R.layout.not_complete_dial);
@@ -238,7 +237,10 @@ public class MainActivity extends AppCompatActivity {
             String output = "json";
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
             try{
-                data = downloadUrl(url);
+                /**
+                 * for performance analysis purpose: commenting out calling the server part
+                 */
+//                data = downloadUrl(url);
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
             }
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 jObject = new JSONObject(jsonData[0]);
                 places = placeJsonParser.parse(jObject);
             }catch(Exception e){
-                Log.d("Exception",e.toString());
+//                Log.d("Exception",e.toString());
             }
             return places;
         }
@@ -275,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<HashMap<String, String>> result) {
             String[] from = new String[] {"description"};
             int[] to = new int[] {android.R.id.text1};
+            if(result==null||result.isEmpty()) return;
             SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, android.R.layout.simple_list_item_1, from, to);
             curTxt.setAdapter(adapter);
         }
@@ -298,7 +301,10 @@ public class MainActivity extends AppCompatActivity {
             }
             String url = SERVER + src + "&" + dest + "&" + miles;
             try{
-                data = downloadUrl(url);
+                /**
+                 * for performance analysis purpose: commenting out calling the server part
+                 */
+//                data = downloadUrl(url);
                 System.out.println(data);
             }catch(Exception e){
                 Log.d("Gas station task Background Task", e.toString());

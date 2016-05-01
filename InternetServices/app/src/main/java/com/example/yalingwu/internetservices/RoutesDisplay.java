@@ -137,6 +137,7 @@ public class RoutesDisplay extends FragmentActivity {
             map.setMyLocationEnabled(true);
             src = getLocationFromAddress(source_addr);
             dst = getLocationFromAddress(dest_addr);
+            System.out.print("src: "+src.toString()+"\ndst: "+dst.toString());
             markerPoints.add(src);
             markerPoints.add(dst);
             MarkerOptions options_src = new MarkerOptions();
@@ -145,8 +146,13 @@ public class RoutesDisplay extends FragmentActivity {
             options_src.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             options_dst.position(dst);
             options_dst.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            map.addMarker(options_src);
-            map.addMarker(options_dst);
+            try {
+                map.addMarker(options_src);
+                map.addMarker(options_dst);
+            }
+            catch (Exception e) {
+                Log.d("Exception while adding markers to the map", e.getMessage());
+            }
             Line_color = Color.rgb(153, 51, 204);
             String url = getDirectionsUrl(src, dst, null);
             DownloadTask downloadTask = new DownloadTask();
@@ -195,12 +201,15 @@ public class RoutesDisplay extends FragmentActivity {
     // turns address into latitude and longitude
     private LatLng getLocationFromAddress(String strAddress) {
         Geocoder coder = new Geocoder(this);
-        List<Address> address;
+        List<Address> address=null;
         LatLng loc = null;
         try {
-            address = coder.getFromLocationName(strAddress,1);
+            /**
+             * for performance analysis purpose: commenting out calling the server part and return a random LatLng object to mark on the map
+             */
+//            address = coder.getFromLocationName(strAddress,1);
             if (address == null) {
-                return null;
+                return new LatLng(33.777554, -84.388116); //biltmore midtown
             }
             Address location=address.get(0);
             loc = new LatLng(location.getLatitude(), location.getLongitude());
@@ -305,7 +314,10 @@ public class RoutesDisplay extends FragmentActivity {
         protected String doInBackground(String... url) {
             String data = "";
             try {
-                data = downloadUrl(url[0]);
+                /**
+                 * for performance analysis purpose: commenting out calling the server part
+                 */
+//                data = downloadUrl(url[0]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
@@ -338,7 +350,10 @@ public class RoutesDisplay extends FragmentActivity {
                 DirectionsJSONParser parser = new DirectionsJSONParser();
                 routes = parser.parse(jObject);
             } catch (Exception e) {
-                e.printStackTrace();
+                /**
+                 * for performance analysis purpose: commenting out printing e.stack
+                 */
+//                e.printStackTrace();
             }
             return routes;
         }
@@ -348,7 +363,7 @@ public class RoutesDisplay extends FragmentActivity {
             ArrayList<LatLng> points = null;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
-            if(result.isEmpty()) {
+            if(result==null||result.isEmpty()) {
                 System.out.println("NO RESULTS FOUND FOR THE ROUTE");
                 return;
             }
@@ -380,7 +395,7 @@ public class RoutesDisplay extends FragmentActivity {
                 else map.addPolyline(lineOptions);
             }
             long time= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " After the main polyline: Time value in millisecinds "+time);
+            android.util.Log.i("Time Class ", " After the polyline: Time value in millisecinds "+time);
         }
     }
 

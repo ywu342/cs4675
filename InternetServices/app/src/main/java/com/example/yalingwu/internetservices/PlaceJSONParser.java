@@ -15,7 +15,10 @@ public class PlaceJSONParser {
         try {
             jPlaces = jObject.getJSONArray("predictions");
         } catch (JSONException e) {
-            e.printStackTrace();
+            /**
+             * for performance analysis purpose: commenting out printing e
+             */
+//            e.printStackTrace();
         }
         return getPlaces(jPlaces);
     }
@@ -30,7 +33,10 @@ public class PlaceJSONParser {
                 place = getPlace((JSONObject)jPlaces.get(i));
                 placesList.add(place);
             } catch (JSONException e) {
-                e.printStackTrace();
+                /**
+                 * for performance analysis purpose: commenting out printing e
+                 */
+//                e.printStackTrace();
             }
         }
         return placesList;
@@ -51,7 +57,10 @@ public class PlaceJSONParser {
             place.put("_id",id);
             place.put("reference",reference);
         } catch (JSONException e) {
-            e.printStackTrace();
+            /**
+             * for performance analysis purpose: commenting out printing e
+             */
+//            e.printStackTrace();
         }
         return place;
     }

@@ -29,8 +29,10 @@ public class LocationAddress {
                 Geocoder geocoder = new Geocoder(context, Locale.getDefault());
                 String result = null;
                 try {
-                    List<Address> addressList = geocoder.getFromLocation(
-                            latitude, longitude, 1);
+                    /**
+                     * for performance analysis purpose: commenting out calling the server part
+                     */
+                    List<Address> addressList=null; //= geocoder.getFromLocation(latitude, longitude, 1);
                     if (addressList != null && addressList.size() > 0) {
                         Address address = addressList.get(0);
                         StringBuilder sb = new StringBuilder();
@@ -42,7 +44,7 @@ public class LocationAddress {
                         sb.append(address.getCountryName());
                         result = sb.toString();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.e(TAG, "Unable connect to Geocoder", e);
                 } finally {
                     Message message = Message.obtain();
