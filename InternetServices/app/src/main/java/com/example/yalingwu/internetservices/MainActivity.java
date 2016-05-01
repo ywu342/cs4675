@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         try{
             URL url = new URL(strUrl);
             long time= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", "When URL connection starts: Time value in milliseconds " + time);
+//            android.util.Log.i("Time Class ", "When URL connection starts: Time value in milliseconds " + time);
             urlConnection = (HttpURLConnection)url.openConnection();
             urlConnection.connect();
             iStream = urlConnection.getInputStream();
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             iStream.close();
             urlConnection.disconnect();
             long time= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", "When URL connection closes: Time value in milliseconds " + time);
+//            android.util.Log.i("Time Class ", "When URL connection closes: Time value in milliseconds " + time);
         }
         return data;
     }
@@ -299,20 +299,20 @@ public class MainActivity extends AppCompatActivity {
             String url = SERVER + src + "&" + dest + "&" + miles;
             try{
                 data = downloadUrl(url);
-                System.out.println(data);
+//                System.out.println(data);
             }catch(Exception e){
                 Log.d("Gas station task Background Task", e.toString());
             }
-            System.out.println("returning data");
+//            System.out.println("returning data");
             return data;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            System.out.println("is before super.onpost happening?");
+//            System.out.println("is before super.onpost happening?");
             super.onPostExecute(result);
-            System.out.println("is onpost for gasStnTask happening?");
-            System.out.println("==============================================\ndata from our server: " + result + "\n==============================================");
+//            System.out.println("is onpost for gasStnTask happening?");
+//            System.out.println("==============================================\ndata from our server: " + result + "\n==============================================");
             gsParserTask = new GSParserTask();
             gsParserTask.execute(result);
         }
@@ -328,14 +328,14 @@ public class MainActivity extends AppCompatActivity {
             List<HashMap<String, String>> stations = null;
             GSJSONParser gsJsonParser = new GSJSONParser();
             try{
-                System.out.println("parsing SERVER json array");
-                System.out.println(jsonData[0]);
+//                System.out.println("parsing SERVER json array");
+//                System.out.println(jsonData[0]);
                 jsonArray = new JSONArray(jsonData[0]);
                 stations = gsJsonParser.parse(jsonArray);
             }catch(Exception e){
                 Log.d("Exception",e.toString());
             }
-            System.out.println("returning stations list");
+//            System.out.println("returning stations list");
             return stations;
         }
 
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                 //goToResults.putExtra("PRICES_LIST", strArr);
                 startActivity(goToResults);
             } else {
-                System.out.println("creating stations coord");
+//                System.out.println("creating stations coord");
                 stations_coord = new ArrayList<LatLng>();
                 for (int i = 0; i < result.size(); i++) {
                     HashMap<String, String> station = result.get(i);
