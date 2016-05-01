@@ -69,6 +69,7 @@ public class RoutesDisplay extends FragmentActivity {
     int Line_color=Color.BLACK;
     Polyline selected_line;
     int selectedIndex = -1;
+    int counter = 0;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -102,6 +103,8 @@ public class RoutesDisplay extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
+                long time= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " After clicking on one list item: Time value in millisecinds "+time);
                 selectedIndex = position;
                 if(selected_line!=null) selected_line.remove();
                 String stationAddr = (String) parent.getItemAtPosition(position);
@@ -113,6 +116,8 @@ public class RoutesDisplay extends FragmentActivity {
                 map.addMarker(options_station);
                 Line_color = NEW_ROUTE_COLOR;
                 String url = getDirectionsUrl(src, dst, stationLoc);
+                long routetime_1= System.currentTimeMillis();
+                android.util.Log.i("Time Class ", " About to ask for the src-gas-dst route: Time value in millisecinds " + routetime_1);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
             }
@@ -123,8 +128,8 @@ public class RoutesDisplay extends FragmentActivity {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(stations_coord[i].latitude, stations_coord[i].longitude,
                     getApplicationContext(), new GeocoderHandler());
-            listTime= System.currentTimeMillis();
-            android.util.Log.i("Time Class ", " After the " + i + "th list item: Time value in millisecinds " + listTime);
+//            listTime= System.currentTimeMillis();
+//            android.util.Log.i("Time Class ", " After the " + i + "th list item: Time value in millisecinds " + listTime);
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -149,6 +154,8 @@ public class RoutesDisplay extends FragmentActivity {
             map.addMarker(options_dst);
             Line_color = Color.rgb(153, 51, 204);
             String url = getDirectionsUrl(src, dst, null);
+            long routetime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " About to ask for the src-dst route: Time value in millisecinds " + routetime);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
         }
@@ -398,6 +405,8 @@ public class RoutesDisplay extends FragmentActivity {
             }
             addrList.add(locationAddress);
             ((BaseAdapter) stationList.getAdapter()).notifyDataSetChanged();
+            long listTime= System.currentTimeMillis();
+            android.util.Log.i("Time Class ", " After the " + counter++ + "th list item update: Time value in millisecinds " + listTime);
         }
     }
 }
